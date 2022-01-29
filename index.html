@@ -1,25 +1,59 @@
 <!DOCTYPE html>
-<html>
-   <head>
-       <meta charset="utf-8">
-       <script src="angular.min.js"></script>
-       <script src="app.js"></script>
-       <link href="/Module1-Solution/style.css"/>
-       <title> Lunch Check </title>
-     </head>
-     <body ng-app="LunchCheck">
-       <div ng-controller="LunchCheckController">
-         <div>
-            <input type="text" ng-model="items"/>
-            <label ng-if="!items1 && !items2 && !items3" style="color:red">{{message1}}</label>
-            <label ng-if="items1" class="msg1" style="color:red">{{message1}}</label>
-            <label ng-if="items2" class="msg2" style="color:green">{{message2}}</label>
-            <label ng-if="items3" class="msg2" style="color:green">{{message3}}</label>
-          </div>
-        <br/>
-        <div>
-            <button class="btn" ng-click="itemsCheck();" ng-model="itemsCheck();">Check If Too Much!</button>
-       </div>
-     </div>
-   </body>
+<html ng-app = "ShoppingListCheckOff">
+<head>
+  <meta charset="utf-8">
+  <script src="angular.min.js"></script>
+  <script src="app.js"></script>
+  <style>
+  div.style{
+    float:left;
+    padding:10px;
+      }
+  h2.font{
+    text-align: center;
+  }
+  h3.font{
+    color: Green;
+  }
+span.btn{
+  padding-left:25px;
+  padding-right:10px;
+}
+li.list{
+  padding:5px;
+}
+      </style>
+  </head>
+
+<body>
+  <h1>Shopping List Check Off Application</h1>
+  <div>
+  <div ng-controller='ToBuyController as showLists' class="style">
+      <h2 class="font"> To Buy</h2>
+    <div ng-if="showLists.items.length == 0 || showLists.items == ''">
+      <h3 class="font">Everything is bought!</h3>
+    </div>
+      <ol>
+      <li ng-repeat="item in showLists.items" class="list">
+        Buy {{item.quantity}} {{item.name}}
+
+      <span class="btn">  <button  ng-click="showLists.removeItems($index , item.name , item.quantity);"> Bought </button></span>
+      </li>
+    </ol>
+  </div>
+
+
+  <div ng-controller='AlreadyBoughtController as showListsBoughtItems'  class="style">
+    <h2 class="font">Already Bought </h2>
+    <div ng-if="showListsBoughtItems.itemsBought.length == 0 || showListsBoughtItems.itemsBought == ''">
+      <h3 class="font">Nothing bought yet!</h3>
+    </div>
+    <ol>
+      <li ng-repeat="itembought in showListsBoughtItems.itemsBought" class="list">
+        Bought {{itembought.quantity}} {{itembought.name}}
+      </li>
+    </ol>
+  </div>
+</div>
+</body>
 </html>

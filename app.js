@@ -1,42 +1,82 @@
-(function (){
+(function () {
 'use strict';
 
-angular.module('LunchCheck',[])
-.controller('LunchCheckController', LunchCheckController);
+angular.module('ShoppingListCheckOff',[])
+.controller('ToBuyController',ToBuyController)
+.controller('AlreadyBoughtController',AlreadyBoughtController)
+.service('ShoppingListCheckOffService', ShoppingListCheckOffService);
 
-LunchCheckController.$inject=['$scope'];
+ToBuyController.$inject = ['ShoppingListCheckOffService'];
+function ToBuyController(ShoppingListCheckOffService){
+var showLists = this;
 
-function LunchCheckController($scope){
-  $scope.itemsCheck = function () {
+ showLists.items = ShoppingListCheckOffService.getItems();
 
-  var str = $scope.items;
-
-    if(!angular.isUndefined(str)){
-
-      var words = str.split(",");
-
-        if(words == ""){
-          $scope.message1 = "Please enter data first";
-          $scope.items1 = true;
-          $scope.items2 = false;
-          $scope.items3 = false;
-        }
-        else if(words.length>3){
-        $scope.message2 = "Too much!";
-        $scope.items2 = true;
-        $scope.items1 = false;
-        $scope.items3 = false;
-      }
-      else if(words.length<=3 && words.length>0){
-        $scope.message3 = "Enjoy!";
-        $scope.items3 = true;
-        $scope.items2 = false;
-        $scope.items1 = false;
-      }
-    }
-    else if(angular.isUndefined(str)){
-      $scope.message1 = "Please enter data first";
-    }
+  showLists.removeItems = function (itemIndex, name , quantity) {
+    ShoppingListCheckOffService.removeItem(itemIndex, name , quantity);
   };
 }
-}) ();
+
+
+AlreadyBoughtController.$inject=['ShoppingListCheckOffService'];
+function AlreadyBoughtController(ShoppingListCheckOffService){
+  var showListsBoughtItems = this;
+
+    showListsBoughtItems.itemsBought = ShoppingListCheckOffService.getItemsBought();
+  }
+
+
+   function ShoppingListCheckOffService() {
+      var service = this;
+
+      //List of items in ToBuy array
+      var toBuy = [
+        {
+          name : "Cookies",
+          quantity : 10
+        },
+        {
+          name : "Biscuits",
+          quantity : 10
+        },
+        {
+          name : "Chocolates",
+          quantity : 10
+        },
+        {
+          name : "Candies",
+          quantity : 10
+        },
+        {
+          name : "Ribbons",
+          quantity : 10
+        }
+      ];
+
+      //List of items in Bought array
+      var bought = [];
+
+      service.removeItem = function(itemIndex, itemName , quantity){
+      var itemRemoved = toBuy.splice(itemIndex,1);
+
+      service.addItem(itemName , quantity);
+    };
+
+    service.addItem = function(itemName, quantity){
+        var item = {
+          name: itemName,
+          quantity: quantity
+        };
+        bought.push(item);
+      };
+
+    service.getItems = function () {
+      return toBuy;
+    };
+
+    service.getItemsBought = function () {
+      return bought;
+    };
+   }
+
+})();
