@@ -1,82 +1,88 @@
 (function () {
 'use strict';
 
-angular.module('ShoppingListCheckOff',[])
-.controller('ToBuyController',ToBuyController)
-.controller('AlreadyBoughtController',AlreadyBoughtController)
-.service('ShoppingListCheckOffService', ShoppingListCheckOffService);
+angular.module('NarrowItDownApp',[])
+.controller('NarrowItDownController',NarrowItDownController)
+.service('MenuSearchService', MenuSearchService)
+.directive('foundItems', FoundItems)
+.constant('ApiBasePath', "https://davids-restaurant.herokuapp.com");
 
-ToBuyController.$inject = ['ShoppingListCheckOffService'];
-function ToBuyController(ShoppingListCheckOffService){
-var showLists = this;
+function FoundItems() {
+  var ddo = {
+    templateUrl: 'foundItems.html',
+    restrict:'E',
+    scope: {
+      items: '<',
+      onRemove: '&'
+    },
+    controller: FoundItemsDirectiveController,
+    controllerAs: 'menu',
+    bindToController: true,
+  };
+  return ddo;
+}
 
- showLists.items = ShoppingListCheckOffService.getItems();
-
-  showLists.removeItems = function (itemIndex, name , quantity) {
-    ShoppingListCheckOffService.removeItem(itemIndex, name , quantity);
+function FoundItemsDirectiveController(){
+  var menu = this;
+  menu.isEmptyList = function(){
+      if((!angular.isUndefined(menu.items) && menu.items.length === 0 ) || angular.isUndefined(menu.items)){
+               return true;
+       }
+    else {
+               return false;
+           }
   };
 }
 
+NarrowItDownController.$inject = ['MenuSearchService'];
+function NarrowItDownController(MenuSearchService) {
+    var menu = this;
+    menu.filter = function () {
+    if(!angular.isUndefined(menu.searchTerm) && menu.searchTerm!="" ){
+    var promise = MenuSearchService.getMatchedMenuItems(menu.searchTerm.toLowerCase());
+    promise.then(function(response) {
+      menu.items = response;
+      }).catch(function(error){
+              console.log(error.message);
+      });
+    }
+    else{
+      menu.items = [];
+    menu.isEmptyList = function(){
+         return true;
+       };
+         }
+   };
 
-AlreadyBoughtController.$inject=['ShoppingListCheckOffService'];
-function AlreadyBoughtController(ShoppingListCheckOffService){
-  var showListsBoughtItems = this;
-
-    showListsBoughtItems.itemsBought = ShoppingListCheckOffService.getItemsBought();
+    menu.remove = function(index){
+      menu.items.splice(index,1);
+    };
   }
 
 
-   function ShoppingListCheckOffService() {
-      var service = this;
+   MenuSearchService.$inject = ['$http', 'ApiBasePath'];
 
-      //List of items in ToBuy array
-      var toBuy = [
-        {
-          name : "Cookies",
-          quantity : 10
-        },
-        {
-          name : "Biscuits",
-          quantity : 10
-        },
-        {
-          name : "Chocolates",
-          quantity : 10
-        },
-        {
-          name : "Candies",
-          quantity : 10
-        },
-        {
-          name : "Ribbons",
-          quantity : 10
-        }
-      ];
+   function MenuSearchService($http, ApiBasePath) {
+        var service = this;
 
-      //List of items in Bought array
-      var bought = [];
-
-      service.removeItem = function(itemIndex, itemName , quantity){
-      var itemRemoved = toBuy.splice(itemIndex,1);
-
-      service.addItem(itemName , quantity);
-    };
-
-    service.addItem = function(itemName, quantity){
-        var item = {
-          name: itemName,
-          quantity: quantity
-        };
-        bought.push(item);
+        service.getMatchedMenuItems = function(searchTerm) {
+           return $http({
+               method: "GET",
+               url: (ApiBasePath + "/menu_items.json")
+           }).then(function success(result){
+             var foundItems = [];
+             result.data.menu_items.forEach(function(item) {
+                  if (item.description.indexOf(searchTerm) != -1) {
+                       foundItems.push({
+                       name: item.name,
+                       short_name: item.short_name,
+                       description: item.description
+                    });
+                  }
+               });
+           return foundItems;
+         });
       };
+     }
 
-    service.getItems = function () {
-      return toBuy;
-    };
-
-    service.getItemsBought = function () {
-      return bought;
-    };
-   }
-
-})();
+}) ();

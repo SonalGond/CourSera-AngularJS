@@ -1,0 +1,9 @@
+<div class="padding">
+<ul>
+   <li ng-repeat="item in menu.items" >
+    {{ item.short_name }},  {{ item.name }},  {{ item.description }}
+    <button class="btn btn-primary" ng-click="menu.onRemove({index: $index});">Don't want this one!</button>
+  </li>
+</ul>
+</div>
+  <div class="error" ng-if="menu.isEmptyList()">Nothing Found!</div>

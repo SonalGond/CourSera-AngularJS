@@ -1,2 +1,2 @@
-# module2-solution
-module2-solution
+# module3-solution
+Narrow It Down App
