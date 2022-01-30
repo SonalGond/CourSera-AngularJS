@@ -1,2 +1,2 @@
-# cour-sera
+# CourSera AngularJS
 Sample progs
