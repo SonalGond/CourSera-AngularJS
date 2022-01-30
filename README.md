@@ -1,4 +1,4 @@
 # CourSera AngularJS
  
-The assignment requirements are located inside the repository with all the example code for this course:
+Questions and example code are located inside the below repository:
 https://github.com/jhu-ep-coursera/fullstack-course5
